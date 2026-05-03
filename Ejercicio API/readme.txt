@@ -98,13 +98,13 @@ TEST 4: Consultar mascotas por estatus con validación flexible (@findPetsByStat
 - Validaciones: Estructura correcta, todos los pets tienen status="sold"
 - Salida: Lista validada de mascotas "sold" con verificación de consistencia
 
-CARACTERÍSTICAS DE LA IMPLEMENTACIÓN PROFESIONAL:
+CARACTERÍSTICAS DE LA IMPLEMENTACIÓN:
 - Sintaxis nativa de Karate (sin step definitions externas)
 - Cada escenario es completamente INDEPENDIENTE y autocontenido
 - Patrón create-first para tests de consulta, garantizando datos disponibles
 - IDs únicos generados dinámicamente usando timestamps para evitar conflictos
 - Test data factory pattern para generación consistente de datos
-- Tags profesionales (@addPet, @getPetById, @updatePet, @findPetsByStatus)
+- Tags (@addPet, @getPetById, @updatePet, @findPetsByStatus)
 - Validación de schema flexible para manejar variabilidad de la API
 - Documentación completa de objetivos, reglas de negocio y outcomes esperados
 - Configuración por entornos centralizada en karate-config.js
@@ -184,9 +184,3 @@ En caso de problemas, revisar:
 1. Los logs en target/karate.log
 2. Los reportes HTML en target/karate-reports/
 3. La documentación oficial de Karate: https://github.com/karatelabs/karate
-
-NOTA IMPORTANTE
----------------
-Este proyecto utiliza la API pública de PetStore (https://petstore.swagger.io/v2).
-Los datos son reales pero temporales, por lo que pueden ser modificados o eliminados
-por otros usuarios de la API.
