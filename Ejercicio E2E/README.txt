@@ -143,9 +143,7 @@ SOLUCION DE PROBLEMAS COMUNES
 
 INFORMACION DEL PROYECTO
 ------------------------
-- Fecha de creacion: 25 de Septiembre, 2025
 - Ultima actualizacion: 03 de Mayo, 2026
-- Version: 2.1
+- Version: 1.0
 - Autor: Alexander Morales
-- Sitio objetivo: https://demoblaze.com/
-- Estado del proyecto: completo y listo para evaluacion
+

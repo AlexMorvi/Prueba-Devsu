@@ -74,3 +74,9 @@ Opcion 2: Ejecucion selectiva por etiquetas (tags)
 
 Opcion 3: Ejecucion de suite completa excluyendo ignorados
   mvn test -Dkarate.options="--tags ~@ignore"
+
+INFORMACION DEL PROYECTO
+------------------------
+- Ultima actualizacion: 03 de Mayo, 2026
+- Version: 1.0
+- Autor: Alexander Morales
