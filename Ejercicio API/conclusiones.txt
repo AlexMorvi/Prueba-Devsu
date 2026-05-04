@@ -11,19 +11,28 @@ CORRECCIONES IMPLEMENTADAS
    completamente independientes, cada uno con sus propias precondiciones explícitas
 
 3. ESTRUCTURA LIMPIA Y MANTENIBLE: Se organizó el código con secciones claras 
-   usando Background para test data factory y comentarios estructurados
+   usando Background para cargar schemas y parámetros comunes
 
-4. IDS ÚNICOS DINÁMICOS: Se implementó generación de IDs únicos usando timestamps 
+4. ESTILO BDD EXPLÍCITO: Se mantienen pasos Given/When/Then en cada escenario
+   para trazabilidad y lectura sencilla
+
+5. IDS ÚNICOS DINÁMICOS: Se implementó generación de IDs únicos usando timestamps 
    para evitar conflictos entre ejecuciones paralelas
 
-5. TAGS PROFESIONALES: Se implementaron tags (@addPet, @getPetById, @updatePet, @findPetsByStatus) 
+6. TAGS PROFESIONALES: Se implementaron tags (@addPet, @getPetById, @updatePet, @findPetsByStatus) 
    para ejecución selectiva de escenarios individuales
 
-6. PATRÓN CREATE-FIRST: Cada test de consulta crea explícitamente los datos 
+7. PATRÓN CREATE-FIRST: Cada test de consulta crea explícitamente los datos 
    necesarios en lugar de asumir que existen
 
-7. VALIDACIONES COMPLETAS: Cada escenario valida entradas, procesa la operación, 
+8. VALIDACIONES COMPLETAS: Cada escenario valida entradas, procesa la operación, 
    y verifica salidas según los requisitos del ejercicio
+
+9. CONTRATOS EXTERNOS: Se separaron schemas strict/flex en archivos JSON para
+   validación de contrato reutilizable y mantenible
+
+10. FACTORY CENTRALIZADA: La generación de datos y utilidades se centralizó en
+    karate-config.js para reutilización estandarizada
 
 RESUMEN
 -----------------
@@ -173,7 +182,7 @@ CONCLUSIONES FINALES
    - Test data factory patterns eliminan duplicación y mejoran mantenibilidad
    - IDs únicos generados dinámicamente evitan conflictos en ejecuciones paralelas
    - Delays estratégicos manejan consistencia eventual en APIs distribuidas
-   - Validaciones flexibles de schema manejan variabilidad de datos reales
+   - Validaciones con schemas strict/flex facilitan contratos más claros
    - El logging estructurado es más efectivo que prints excesivos
    - La simplicidad y claridad del código es más valiosa que la "elegancia" sintáctica
 

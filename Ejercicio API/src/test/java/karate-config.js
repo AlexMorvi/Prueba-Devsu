@@ -13,6 +13,39 @@ function karateConfig() {
   // Environment-specific configuration
   var environment = karate.env || 'demo';
   karate.log('Running tests against PetStore Demo API in environment:', environment);
+
+  // Session-level data for deterministic IDs
+  var baseTimestamp = java.lang.System.currentTimeMillis();
+  var sessionPetId = Math.floor(baseTimestamp % 1000000);
+
+  // Helper functions (available globally in features)
+  var generateScenarioId = function(offset) {
+    return Math.floor(sessionPetId + offset);
+  };
+
+  var buildPetData = function(petId, name, status) {
+    return {
+      "id": Math.floor(petId),
+      "category": {
+        "id": 1,
+        "name": "Automation Test Category"
+      },
+      "name": name,
+      "photoUrls": ["https://example.com/photos/pet-" + petId + ".jpg"],
+      "tags": [
+        {
+          "id": 100,
+          "name": "automated-test"
+        }
+      ],
+      "status": status
+    };
+  };
+
+  var sleep = function(ms) {
+    java.lang.Thread.sleep(ms);
+    return true;
+  };
   
   // Base configuration object
   var config = {
@@ -32,7 +65,12 @@ function karateConfig() {
       // Test execution settings
       consistencyDelay: 1000, // Delay for data consistency
       cleanupEnabled: false // Manual cleanup for demo API
-    }
+    },
+
+    // Reusable helpers
+    generateScenarioId: generateScenarioId,
+    buildPetData: buildPetData,
+    sleep: sleep
   };
   
   // Environment-specific overrides

@@ -23,10 +23,14 @@ ESTRUCTURA DEL PROYECTO
 -----------------------
 petstore-api-tests/
 ├── pom.xml                              # Configuración Maven con dependencias de Karate
-├── src/test/java/petstore/
-│   ├── PetStoreRunner.java             # Clase runner para ejecutar los tests
-│   ├── karate-config.js                # Configuración base de Karate
-│   └── petstore-tests.feature          # Archivo con todos los escenarios de prueba
+├── src/test/java/
+│   ├── karate-config.js                # Configuración base de Karate y helpers globales
+│   └── petstore/
+│       ├── PetStoreTest.java           # Clase runner para ejecutar los tests
+│       ├── petstore-tests.feature      # Archivo con todos los escenarios de prueba
+│       └── schemas/                    # Contratos de respuesta (strict/flex)
+│           ├── pet.schema.strict.json
+│           └── pet.schema.flex.json
 ├── readme.txt                          # Este archivo
 └── conclusiones.txt                    # Hallazgos y conclusiones
 
@@ -35,7 +39,7 @@ PASOS PARA EJECUTAR LAS PRUEBAS
 
 1. NAVEGAR AL DIRECTORIO DEL PROYECTO
    Abrir PowerShell y navegar a la carpeta del proyecto:
-   cd "c:\Users\ariel.morales\Documents\GitHub\Ejercicios-E2E-y-API\Ejercicio API"
+   cd "c:\Users\ariel.morales\Ejercicios-E2E-y-API\Ejercicio API"
 
 2. INSTALAR DEPENDENCIAS
    Ejecutar el siguiente comando para descargar las dependencias de Maven:
@@ -100,12 +104,13 @@ TEST 4: Consultar mascotas por estatus con validación flexible (@findPetsByStat
 
 CARACTERÍSTICAS DE LA IMPLEMENTACIÓN:
 - Sintaxis nativa de Karate (sin step definitions externas)
+- Estilo BDD con Given/When/Then en todos los escenarios
 - Cada escenario es completamente INDEPENDIENTE y autocontenido
 - Patrón create-first para tests de consulta, garantizando datos disponibles
 - IDs únicos generados dinámicamente usando timestamps para evitar conflictos
-- Test data factory pattern para generación consistente de datos
+- Test data factory pattern centralizado en karate-config.js
 - Tags (@addPet, @getPetById, @updatePet, @findPetsByStatus)
-- Validación de schema flexible para manejar variabilidad de la API
+- Validación de contratos con schemas strict/flex en archivos JSON
 - Documentación completa de objetivos, reglas de negocio y outcomes esperados
 - Configuración por entornos centralizada en karate-config.js
 - Delays estratégicos para manejar consistencia eventual de datos
@@ -116,6 +121,7 @@ VARIABLES Y DATOS DE PRUEBA (TEST DATA FACTORY)
 - sessionPetId: Math.floor(baseTimestamp % 1000000) (ID base único por sesión)
 - generateScenarioId(offset): Genera IDs únicos por escenario evitando conflictos
 - buildPetData(petId, name, status): Función factory para crear objetos pet consistentes
+   (definidas en karate-config.js)
 
 DATOS GENERADOS DINÁMICAMENTE:
 - petId: Único por escenario (sessionPetId + offset)
