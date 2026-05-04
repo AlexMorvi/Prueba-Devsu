@@ -77,5 +77,6 @@ drivers/*.zip
 drivers/*.tar.gz
 reports/*.html
 reports/*.xml
+reports/screenshots/
 logs/
 temp_files/

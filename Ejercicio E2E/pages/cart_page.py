@@ -1,7 +1,17 @@
-# Page Object Model for Cart Page
+from dataclasses import dataclass
+from typing import List, Optional
+
+from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.by import By
-from utils.driver_manager import BasePage
-import time
+from selenium.webdriver.support.ui import WebDriverWait
+
+from pages.base_page import BasePage
+
+
+@dataclass(frozen=True)
+class CartItem:
+    name: str
+    price: int
 
 class CartPage(BasePage):
     # Locators
@@ -13,81 +23,88 @@ class CartPage(BasePage):
     TOTAL_PRICE = (By.ID, "totalp")
     PLACE_ORDER_BUTTON = (By.XPATH, "//button[contains(text(),'Place Order')]")
     
-    def __init__(self, driver):
-        super().__init__(driver)
+    def __init__(self, driver, timeout: int):
+        super().__init__(driver, timeout)
     
     def navigate_to_cart(self):
         """Navigate to cart page"""
-        print("      → Haciendo clic en el enlace del carrito...")
-        self.click_element(self.CART_LINK)
-        time.sleep(3)
-        print("      → Página del carrito cargada")
+        self.click(self.CART_LINK)
+        self.wait_visible(self.PLACE_ORDER_BUTTON)
     
-    def get_cart_items(self):
+    def get_cart_items(self) -> List[CartItem]:
         """Get all items in cart"""
-        print("      → Analizando productos en el carrito...")
-        items = []
-        try:
-            cart_rows = self.driver.find_elements(*self.CART_ITEMS)
-            for i, row in enumerate(cart_rows):
-                try:
+        for attempt in range(3):
+            try:
+                items: List[CartItem] = []
+                for row in self._get_cart_rows():
                     name = row.find_element(*self.ITEM_NAME).text
                     price = row.find_element(*self.ITEM_PRICE).text
-                    items.append({
-                        'name': name,
-                        'price': price
-                    })
-                    print(f"        • Producto {i+1}: {name} - ${price}")
-                except:
-                    continue
-        except:
-            print("      → No se encontraron productos en el carrito")
-        return items
+                    items.append(CartItem(name=name, price=self._parse_price(price)))
+                return items
+            except StaleElementReferenceException:
+                if attempt == 2:
+                    raise
+        return []
     
-    def get_cart_items_count(self):
+    def get_cart_items_count(self) -> int:
         """Get number of items in cart"""
-        try:
-            items = self.driver.find_elements(*self.CART_ITEMS)
-            count = len(items)
-            print(f"      → Conteo de productos: {count}")
-            return count
-        except:
-            print("      → Error al contar productos, asumiendo 0")
-            return 0
+        for attempt in range(3):
+            try:
+                return len(self._get_cart_rows())
+            except StaleElementReferenceException:
+                if attempt == 2:
+                    raise
+        return 0
     
-    def get_total_price(self):
+    def get_total_price(self) -> int:
         """Get total price from cart"""
-        try:
-            total = self.get_text(self.TOTAL_PRICE)
-            print(f"      → Precio total calculado: ${total}")
-            return total
-        except:
-            print("      → Error al obtener precio total, asumiendo $0")
-            return "0"
+        total = self.get_text(self.TOTAL_PRICE)
+        return self._parse_price(total)
     
-    def delete_item(self, item_index=0):
+    def delete_item(self, item_index: int = 0) -> None:
         """Delete an item from cart by index"""
-        print(f"      → Eliminando producto en posición {item_index}...")
-        items = self.driver.find_elements(*self.CART_ITEMS)
-        if items and item_index < len(items):
-            delete_btn = items[item_index].find_element(*self.DELETE_BUTTON)
-            delete_btn.click()
-            time.sleep(2)
-            print("      → Producto eliminado del carrito")
-        else:
-            print("      → No se pudo eliminar el producto (índice inválido)")
+        for attempt in range(3):
+            try:
+                items = self._get_cart_rows()
+                if not items or item_index >= len(items):
+                    return
+
+                before_count = len(items)
+                delete_btn = items[item_index].find_element(*self.DELETE_BUTTON)
+                delete_btn.click()
+                WebDriverWait(self.driver, self.timeout).until(
+                    lambda driver: self.get_cart_items_count() == before_count - 1
+                )
+                return
+            except StaleElementReferenceException:
+                if attempt == 2:
+                    raise
     
     def proceed_to_checkout(self):
         """Click Place Order button"""
-        print("      → Buscando botón 'Place Order'...")
-        self.scroll_to_element(self.PLACE_ORDER_BUTTON)
-        print("      → Haciendo clic en 'Place Order'...")
-        self.click_element(self.PLACE_ORDER_BUTTON)
-        time.sleep(2)
-        print("      → Formulario de checkout abierto")
+        self.scroll_into_view(self.PLACE_ORDER_BUTTON)
+        self.click(self.PLACE_ORDER_BUTTON)
     
-    def is_cart_empty(self):
+    def is_cart_empty(self) -> bool:
         """Check if cart is empty"""
-        is_empty = self.get_cart_items_count() == 0
-        print(f"      → Carrito vacío: {'Sí' if is_empty else 'No'}")
-        return is_empty
+        return self.get_cart_items_count() == 0
+
+    def wait_for_items_count(self, expected_min: int, timeout: Optional[int] = None) -> None:
+        """Wait until cart has at least the expected number of items"""
+        WebDriverWait(self.driver, timeout or self.timeout).until(
+            lambda driver: self.get_cart_items_count() >= expected_min
+        )
+
+    def _get_cart_rows(self):
+        for attempt in range(3):
+            try:
+                return self.driver.find_elements(*self.CART_ITEMS)
+            except StaleElementReferenceException:
+                if attempt == 2:
+                    raise
+        return []
+
+    @staticmethod
+    def _parse_price(value: str) -> int:
+        digits = "".join(ch for ch in value if ch.isdigit())
+        return int(digits) if digits else 0

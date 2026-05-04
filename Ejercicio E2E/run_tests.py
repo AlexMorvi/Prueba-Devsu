@@ -1,44 +1,32 @@
-# Test execution script
+import os
 import subprocess
 import sys
-import os
+from pathlib import Path
 
-def run_tests():
+
+def run_tests() -> int:
     """Run the E2E tests"""
-    
-    print("🚀 Starting E2E Test Execution...")
-    print("=" * 50)
-    
-    # Create reports directory if it doesn't exist
-    if not os.path.exists("reports"):
-        os.makedirs("reports")
-    
-    try:
-        # Run pytest with HTML report
-        result = subprocess.run([
-            sys.executable, "-m", "pytest", 
-            "tests/test_purchase_flow.py",
-            "-v",
-            "--html=reports/test_report.html",
-            "--self-contained-html"
-        ], capture_output=True, text=True)
-        
-        print("STDOUT:")
-        print(result.stdout)
-        
-        if result.stderr:
-            print("STDERR:")
-            print(result.stderr)
-        
-        if result.returncode == 0:
-            print("✅ All tests passed!")
-        else:
-            print("❌ Some tests failed!")
-            
-        print(f"\n📊 Test report generated: reports/test_report.html")
-        
-    except Exception as e:
-        print(f"❌ Error running tests: {str(e)}")
+    base_dir = Path(__file__).resolve().parent
+    reports_dir = base_dir / "reports"
+    reports_dir.mkdir(exist_ok=True)
+
+    config_path = base_dir / "pytest.ini"
+    command = [
+        sys.executable,
+        "-m",
+        "pytest",
+        "-c",
+        str(config_path),
+        "--rootdir",
+        str(base_dir),
+    ]
+    marker = os.getenv("PYTEST_MARKER")
+    if marker:
+        command.extend(["-m", marker])
+
+    result = subprocess.run(command, cwd=base_dir)
+    return result.returncode
+
 
 if __name__ == "__main__":
-    run_tests()
+    raise SystemExit(run_tests())

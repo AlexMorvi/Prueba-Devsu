@@ -1,192 +1,76 @@
-INSTRUCCIONES PASO A PASO PARA EJECUTAR LAS PRUEBAS DE API PETSTORE CON KARATE
-================================================================================
+EJERCICIOS E2E Y API - PETSTORE API AUTOMATION
+==============================================
 
-PRERREQUISITOS
---------------
-✓ Java 11
-✓ Maven 3.9.9
-✓ Conexión a internet (para acceder a la API de PetStore)
+DESCRIPCION DEL PROYECTO
+------------------------
+Este proyecto contiene pruebas automatizadas para la API REST pública de 
+Swagger Petstore utilizando el framework Karate DSL y Java.
 
-INSTALACIONES COMPLETADAS AUTOMÁTICAMENTE:
-- Java JDK: C:\Program Files\Eclipse Adoptium\jdk-11.0.28.6-hotspot
-- Maven: C:\Maven\apache-maven-3.9.9
-- Variables de entorno configuradas para el usuario actual
+OBJETIVO
+--------
+Automatizar el flujo completo de vida (CRUD) de la entidad Pet, validando:
+- Inserción de nuevas mascotas en la plataforma.
+- Consulta y extracción de mascotas por identificador.
+- Actualización de los atributos y estado de mascotas existentes.
+- Búsqueda generalizada y validación modular por el estado de las mascotas.
 
-VERIFICACIÓN DE PRERREQUISITOS
-------------------------------
-Ejecutar los siguientes comandos en PowerShell para verificar las instalaciones:
+TECNOLOGIAS Y FRAMEWORK
+-----------------------
+- Java 11 o superior
+- Apache Maven 3.9+
+- Karate DSL (framework de API Testing)
+- JUnit 5 / Surefire Plugin
 
-java -version
-mvn -version
+ARQUITECTURA
+------------
+- Behavior Driven Development (BDD) adaptado a sintaxis implícita de Karate.
+- Patrón Create-First para garantizar independencia total entre tests.
+- Centralización de configuraciones dinámicas (Test Data Factory) vía JavaScript.
+- Esquemas de validación de contratos JSON segregados (strict y flex).
 
 ESTRUCTURA DEL PROYECTO
 -----------------------
-petstore-api-tests/
-├── pom.xml                              # Configuración Maven con dependencias de Karate
-├── src/test/java/
-│   ├── karate-config.js                # Configuración base de Karate y helpers globales
-│   └── petstore/
-│       ├── PetStoreTest.java           # Clase runner para ejecutar los tests
-│       ├── petstore-tests.feature      # Archivo con todos los escenarios de prueba
-│       └── schemas/                    # Contratos de respuesta (strict/flex)
-│           ├── pet.schema.strict.json
-│           └── pet.schema.flex.json
-├── readme.txt                          # Este archivo
-└── conclusiones.txt                    # Hallazgos y conclusiones
+Ejercicios-E2E-y-API/
++-- Ejercicio API/
+   +-- pom.xml                          # Dependencias y Build (Maven)
+   +-- src/test/java/
+   |   +-- karate-config.js             # Configuracion Karate e inyección de datos
+   |   +-- petstore/
+   |       +-- PetStoreTest.java        # Runner de ejecucion
+   |       +-- petstore-tests.feature   # Escenarios de prueba consolidados
+   |       +-- schemas/                 # Contratos de validacion
+   |           +-- pet.schema.flex.json
+   |           +-- pet.schema.strict.json
+   +-- target/                          # Compilación y reportes generados
+   +-- conclusiones.txt                 # Hallazgos tecnicos
+   +-- readme.txt                       # Documentacion (este archivo)
 
-PASOS PARA EJECUTAR LAS PRUEBAS
--------------------------------
+GUIA DE INSTALACION
+-------------------
+1. Clonar o acceder al repositorio.
+2. Navegar a la carpeta "Ejercicio API".
+3. Validar las instalaciones previas en el sistema:
+   - java -version
+   - mvn -version
+4. Descargar y resolver las dependencias:
+   - mvn clean compile
 
-1. NAVEGAR AL DIRECTORIO DEL PROYECTO
-   Abrir PowerShell y navegar a la carpeta del proyecto:
-   cd "c:\Users\ariel.morales\Ejercicios-E2E-y-API\Ejercicio API"
-
-2. INSTALAR DEPENDENCIAS
-   Ejecutar el siguiente comando para descargar las dependencias de Maven:
-   mvn clean compile
-
-3. EJECUTAR TODAS LAS PRUEBAS
-   Para ejecutar todos los escenarios de prueba:
-   mvn test
-
-4. EJECUTAR CON REPORTES DETALLADOS
-   Para generar reportes HTML detallados:
-   mvn test -Dkarate.options="--tags ~@ignore"
-
-5. VER RESULTADOS
-   Los resultados se mostrarán en la consola y también se generarán reportes HTML en:
-   target/karate-reports/
-
-DESCRIPCIÓN DE LOS ESCENARIOS DE PRUEBA
----------------------------------------
-
-Los tests implementan 4 escenarios INDEPENDIENTES siguiendo patrones estándar de API testing:
-
-📋 COMPORTAMIENTO ESTÁNDAR DE LA API:
-La API de PetStore sigue patrones REST estándar:
-- GET a un ID inexistente: Retorna 404 (Pet not found)
-- Los pets deben crearse explícitamente usando POST /pet
-- Los tests siguen el patrón estándar de setup → ejecución → validación
-- Cada test crea sus propios datos de prueba para garantizar independencia
-
-TEST 1: Añadir una mascota a la tienda (@addPet)
-- Endpoint: POST /pet
-- Entrada: JSON con datos completos generados dinámicamente
-- ID único: Generado usando timestamp para evitar conflictos
-- Variables: petId, petName, categoryName, tagName generados automáticamente
-- Validaciones: ID, nombre, status, categoría devueltos correctamente
-- Salida: Mascota creada exitosamente con respuesta HTTP 200
-
-TEST 2: Consultar mascota por ID - Patrón estándar (@getPetById)
-- Setup: Crea un pet usando POST /pet con datos de prueba específicos
-- Endpoint: GET /pet/{petId}
-- Comportamiento: Consulta el pet previamente creado en el mismo escenario
-- Validaciones: Verifica que los datos devueltos coincidan exactamente con los creados
-- Salida: Pet consultado exitosamente con validación completa de datos
-
-TEST 3: Actualizar el nombre de la mascota y el estatus a "sold" (@updatePet)
-- Endpoint: PUT /pet  
-- Entrada: JSON con datos actualizados dinámicamente
-- Precondición: Crea mascota inicial con ID único generado
-- Proceso: Actualiza nombre y cambia status de "available" a "sold"
-- Variables: updatedPetName generado, transición de status documentada
-- Validaciones: Cambios aplicados correctamente, campos no modificados preservados
-- Salida: Mascota actualizada con nuevos datos confirmados y auditados
-
-TEST 4: Consultar mascotas por estatus con validación flexible (@findPetsByStatus)
-- Endpoint: GET /pet/findByStatus?status=sold
-- Entrada: Parámetro query status="sold"
-- Precondición: Crea y actualiza mascota a "sold" con delay para consistencia
-- Comportamiento: Validación flexible para manejar datos variables de la API demo
-- Variables: Lista de mascotas, validación de schema adaptable
-- Validaciones: Estructura correcta, todos los pets tienen status="sold"
-- Salida: Lista validada de mascotas "sold" con verificación de consistencia
-
-CARACTERÍSTICAS DE LA IMPLEMENTACIÓN:
-- Sintaxis nativa de Karate (sin step definitions externas)
-- Estilo BDD con Given/When/Then en todos los escenarios
-- Cada escenario es completamente INDEPENDIENTE y autocontenido
-- Patrón create-first para tests de consulta, garantizando datos disponibles
-- IDs únicos generados dinámicamente usando timestamps para evitar conflictos
-- Test data factory pattern centralizado en karate-config.js
-- Tags (@addPet, @getPetById, @updatePet, @findPetsByStatus)
-- Validación de contratos con schemas strict/flex en archivos JSON
-- Documentación completa de objetivos, reglas de negocio y outcomes esperados
-- Configuración por entornos centralizada en karate-config.js
-- Delays estratégicos para manejar consistencia eventual de datos
-
-VARIABLES Y DATOS DE PRUEBA (TEST DATA FACTORY)
------------------------------------------------
-- baseTimestamp: java.lang.System.currentTimeMillis() (timestamp base para sesión)
-- sessionPetId: Math.floor(baseTimestamp % 1000000) (ID base único por sesión)
-- generateScenarioId(offset): Genera IDs únicos por escenario evitando conflictos
-- buildPetData(petId, name, status): Función factory para crear objetos pet consistentes
-   (definidas en karate-config.js)
-
-DATOS GENERADOS DINÁMICAMENTE:
-- petId: Único por escenario (sessionPetId + offset)
-- petName: "API Test Pet - {petId}" o variaciones por escenario
-- categoryId: 1 (fijo)
-- categoryName: "Automation Test Category" (descriptivo)
-- tagId: 100 (fijo)
-- tagName: "automated-test" (identificador de tests automatizados)
-- photoUrls: Array con URL única por pet
-- baseUrl: "https://petstore.swagger.io/v2" (API demo endpoint)
-
-EJECUCIÓN POR ESCENARIOS INDIVIDUALES:
-- Todos los tests: mvn test
-- Solo creación: mvn test -Dkarate.options="--tags @addPet"
-- Solo consulta con patrón create-first: mvn test -Dkarate.options="--tags @getPetById"
-- Solo actualización: mvn test -Dkarate.options="--tags @updatePet"
-- Solo búsqueda por status: mvn test -Dkarate.options="--tags @findPetsByStatus"
-- Tests de smoke: mvn test -Dkarate.options="--tags @smoke"
-- Tests CRUD completos: mvn test -Dkarate.options="--tags @create,@read,@update,@query"
-
-COMANDOS ÚTILES ADICIONALES
----------------------------
-
-Para ejecutar tests con reportes detallados:
-mvn clean test
-
-Para ejecutar solo un escenario específico por nombre:
-mvn test -Dkarate.options="--name '1. Añadir una mascota'"
-
-Para ejecutar con logs más detallados:
-mvn test -Dkarate.env=dev
-
-Para generar reportes HTML completos:
-mvn test (los reportes se generan automáticamente en target/karate-reports/)
-
-RESOLUCIÓN DE PROBLEMAS COMUNES
--------------------------------
-
-1. Error de conexión a la API:
-   - Verificar conexión a internet
-   - Comprobar que https://petstore.swagger.io/v2 esté disponible
-   - Verificar que el endpoint responda: curl https://petstore.swagger.io/v2/pet/findByStatus?status=available
-
-2. Error de compilación Maven:
-   - Verificar que Java 11+ esté instalado: java -version
-   - Verificar que Maven esté instalado: mvn -version
-   - Limpiar y recompilar: mvn clean compile
-
-3. Tests fallan (Exit Code: 1):
-   - Verificar que la API esté disponible
-   - Revisar logs detallados en la consola
-   - Verificar reportes en target/surefire-reports/
-
-4. Error "no step-definition method match found":
-   - Este error indica mezcla de sintaxis Cucumber con Karate
-   - En Karate solo usar: Given path, When method, Then status
-   - No usar: Given I want to..., When I send..., Then I should...
-
-5. Problemas de permisos:
-   - Asegurar que el directorio target/ tenga permisos de escritura
-   - En Windows: Ejecutar PowerShell como administrador si es necesario
-
-CONTACTO Y SOPORTE
+REQUISITOS PREVIOS
 ------------------
-En caso de problemas, revisar:
-1. Los logs en target/karate.log
-2. Los reportes HTML en target/karate-reports/
-3. La documentación oficial de Karate: https://github.com/karatelabs/karate
+- Java JDK 11 configurado en las variables de entorno (JAVA_HOME).
+- Maven correctamente ruteado (M2_HOME / PATH).
+- Acceso a internet para resolucion de plugins de Maven y alcance a petstore.swagger.io.
+
+EJECUCION DE PRUEBAS
+--------------------
+Opcion 1: Ejecucion completa de la suite
+  mvn test
+
+Opcion 2: Ejecucion selectiva por etiquetas (tags)
+  mvn test -Dkarate.options="--tags @addPet"
+  mvn test -Dkarate.options="--tags @getPetById"
+  mvn test -Dkarate.options="--tags @updatePet"
+  mvn test -Dkarate.options="--tags @findPetsByStatus"
+
+Opcion 3: Ejecucion de suite completa excluyendo ignorados
+  mvn test -Dkarate.options="--tags ~@ignore"

@@ -1,7 +1,6 @@
-# Page Object Model for Home Page
 from selenium.webdriver.common.by import By
-from utils.driver_manager import BasePage
-import time
+
+from pages.base_page import BasePage
 
 class HomePage(BasePage):
     # Locators
@@ -22,37 +21,29 @@ class HomePage(BasePage):
     NEXT_BUTTON = (By.ID, "next2")
     PREVIOUS_BUTTON = (By.ID, "prev2")
     
-    def __init__(self, driver):
-        super().__init__(driver)
-        self.url = "https://www.demoblaze.com/"
+    def __init__(self, driver, base_url: str, timeout: int):
+        super().__init__(driver, timeout)
+        self.base_url = base_url
     
     def navigate_to_home(self):
         """Navigate to the home page"""
-        print(f"      → Cargando URL: {self.url}")
-        self.driver.get(self.url)
-        time.sleep(2)
-        print("      → Esperando a que la página se cargue completamente...")
+        self.driver.get(self.base_url)
+        self.wait_visible(self.CATEGORIES_SECTION)
     
     def click_phones_category(self):
         """Click on Phones category"""
-        print("      → Buscando categoría 'Phones'...")
-        self.click_element(self.PHONES_CATEGORY)
-        time.sleep(2)
-        print("      → Categoría 'Phones' seleccionada, cargando productos...")
+        self.click(self.PHONES_CATEGORY)
+        self.wait_visible(self.SAMSUNG_GALAXY_S6)
     
     def click_laptops_category(self):
         """Click on Laptops category"""
-        print("      → Buscando categoría 'Laptops'...")
-        self.click_element(self.LAPTOPS_CATEGORY)
-        time.sleep(2)
-        print("      → Categoría 'Laptops' seleccionada, cargando productos...")
+        self.click(self.LAPTOPS_CATEGORY)
+        self.wait_visible(self.MACBOOK_AIR)
     
     def click_monitors_category(self):
         """Click on Monitors category"""
-        print("      → Buscando categoría 'Monitors'...")
-        self.click_element(self.MONITORS_CATEGORY)
-        time.sleep(2)
-        print("      → Categoría 'Monitors' seleccionada, cargando productos...")
+        self.click(self.MONITORS_CATEGORY)
+        self.wait_visible(self.APPLE_MONITOR_24)
     
     def select_product(self, product_name):
         """Select a product by name"""
@@ -65,23 +56,17 @@ class HomePage(BasePage):
         }
         
         if product_name in product_locators:
-            print(f"      → Buscando producto '{product_name}' en la página...")
-            self.scroll_to_element(product_locators[product_name])
-            print(f"      → Producto '{product_name}' encontrado, haciendo clic...")
-            self.click_element(product_locators[product_name])
-            time.sleep(2)
-            print(f"      → Navegando a la página del producto '{product_name}'...")
+            self.scroll_into_view(product_locators[product_name])
+            self.click(product_locators[product_name])
         else:
             raise ValueError(f"Product {product_name} not found in predefined products")
     
     def click_next_page(self):
         """Click next page button"""
-        if self.is_element_present(self.NEXT_BUTTON):
-            self.click_element(self.NEXT_BUTTON)
-            time.sleep(2)
+        if self.is_present(self.NEXT_BUTTON):
+            self.click(self.NEXT_BUTTON)
     
     def click_previous_page(self):
         """Click previous page button"""
-        if self.is_element_present(self.PREVIOUS_BUTTON):
-            self.click_element(self.PREVIOUS_BUTTON)
-            time.sleep(2)
+        if self.is_present(self.PREVIOUS_BUTTON):
+            self.click(self.PREVIOUS_BUTTON)
