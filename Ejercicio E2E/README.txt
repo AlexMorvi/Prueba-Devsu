@@ -17,7 +17,7 @@ Automatizar el flujo completo de compra en Demoblaze.com, validando:
 
 TECNOLOGIAS Y FRAMEWORK
 -----------------------
-- Python 3.12
+- Python 3.12 (compatible con 3.8+)
 - Selenium WebDriver 4.15.2 (requerido)
 - Pytest 7.4.3 (framework de testing)
 - WebDriver Manager 3.9.1
@@ -32,7 +32,6 @@ ARQUITECTURA
 
 ESTRUCTURA DEL PROYECTO
 -----------------------
-```
 Ejercicios-E2E-y-API/
 +-- Ejercicio E2E/                 # Proyecto principal
    +-- pages/                     # Page Object Model
@@ -52,70 +51,96 @@ Ejercicios-E2E-y-API/
    |   +-- driver_manager.py      # Gestor automatico de WebDriver
    |   +-- logging_config.py      # Configuracion de logging
    +-- reports/                   # Reportes de ejecucion
-   |   +-- test_report.html       # Reporte HTML
    +-- config.py                  # Configuracion por entorno
    +-- pytest.ini                 # Configuracion de Pytest
    +-- requirements.txt           # Dependencias del proyecto
    +-- run_tests.py               # Script principal de ejecucion
    +-- conclusiones.txt           # Hallazgos y analisis tecnico
-   +-- README.txt                 # Documentacion
-```
+   +-- README.txt                 # Documentacion (este archivo)
 
 GUIA DE INSTALACION
 -------------------
 1. Clonar el repositorio
-   - git clone https://github.com/AlexMorvi/Ejercicios-E2E-y-API.git
-   - cd Ejercicios-E2E-y-API
+   - git clone <url-del-repositorio>
+
 2. Navegar a la carpeta del proyecto
    - cd "Ejercicio E2E"
+
 3. Crear entorno virtual
    - python -m venv .venv
+
 4. Activar entorno virtual
-   - Windows: .venv\Scripts\activate
-   - Linux/Mac: source .venv/bin/activate
+   - Windows (CMD):       .venv\Scripts\activate
+   - Windows (PowerShell): .venv\Scripts\Activate.ps1
+   - Linux/Mac:           source .venv/bin/activate
+
 5. Instalar dependencias
    - pip install -r requirements.txt
+
+6. Verificar instalacion
+   - python -c "import selenium; print(selenium.__version__)"
+   - pytest --version
 
 REQUISITOS PREVIOS
 ------------------
 - Python 3.8+ (recomendado 3.12)
-- Google Chrome o Microsoft Edge
-- Conexion a internet para la primera ejecucion de WebDriver Manager
+  Descargar desde: https://www.python.org/downloads/
+  IMPORTANTE: Marcar "Add Python to PATH" durante la instalación en Windows.
+- Google Chrome o Microsoft Edge instalado en el sistema.
+- Conexion a internet para la primera ejecucion (WebDriver Manager descarga
+  el driver compatible automáticamente).
 
 EJECUCION DE PRUEBAS
 --------------------
-Opcion 1: ejecucion rapida
-```
-python run_tests.py
-```
+Opcion 1: Ejecucion rapida (script incluido)
+  python run_tests.py
 
-Opcion 2: ejecucion con pytest
-```
-pytest tests/ -v --html=reports/test_report.html --self-contained-html
-pytest tests/test_purchase_flow.py::test_complete_purchase_flow -v
-```
+Opcion 2: Ejecucion con pytest directamente
+  pytest tests/ -v --html=reports/test_report.html --self-contained-html
 
-Opcion 3: modo headless
-```
-set HEADLESS=true && python run_tests.py
-```
+Opcion 3: Ejecucion de un test especifico
+  pytest tests/test_purchase_flow.py::test_complete_purchase_flow -v
+
+Opcion 4: Modo headless (sin ventana del navegador)
+  Windows (CMD):        set HEADLESS=true && python run_tests.py
+  Windows (PowerShell): $env:HEADLESS="true"; python run_tests.py
+  Linux/Mac:            HEADLESS=true python run_tests.py
+
+EJECUCION DESDE IDE
+--------------------
+PyCharm:
+  1. File > Open > seleccionar la carpeta "Ejercicio E2E".
+  2. Configurar el intérprete de Python:
+     File > Settings > Project > Python Interpreter > seleccionar el venv.
+  3. Click derecho sobre tests/ > Run 'pytest in tests'.
+
+VS Code:
+  1. Abrir la carpeta "Ejercicio E2E".
+  2. Instalar extensiones: "Python" y "Python Test Explorer".
+  3. Seleccionar el intérprete del venv (Ctrl+Shift+P > Python: Select Interpreter).
+  4. Usar el panel de Testing para ejecutar los tests.
+
+IntelliJ IDEA (con plugin Python):
+  1. File > Open > seleccionar la carpeta "Ejercicio E2E".
+  2. Configurar el SDK de Python al venv creado.
+  3. Click derecho sobre tests/ > Run 'pytest in tests'.
 
 VARIABLES DE ENTORNO UTILES
 ---------------------------
-- BROWSER=auto|chrome|edge
+- BROWSER=auto|chrome|edge       Navegador a utilizar (default: auto)
 - BASE_URL=https://www.demoblaze.com/
-- EXPLICIT_WAIT=20
-- PYTEST_MARKER=smoke
+- HEADLESS=true|false            Modo sin ventana (default: false)
+- EXPLICIT_WAIT=20               Tiempo de espera en segundos (default: 15)
+- PYTEST_MARKER=smoke            Ejecutar solo tests con marker específico
 
 CASOS DE PRUEBA
 --------------
-- test_complete_purchase_flow: flujo completo de compra
+- test_complete_purchase_flow: flujo completo de compra (smoke test)
 - test_add_and_remove_from_cart: alta y baja de productos
 - test_empty_cart_checkout: validacion de checkout con carrito vacio
 
 DATOS DE PRUEBA
 --------------
-```
 CUSTOMER_DATA = {
     "name": "Juan Perez",
     "country": "Mexico",
@@ -127,23 +152,47 @@ CUSTOMER_DATA = {
 
 PRODUCTS = ["Samsung galaxy s6", "Nokia lumia 1520"]
 EXPECTED_TOTAL = 1180
-```
 
 REPORTES Y EVIDENCIAS
 ---------------------
 - Reporte HTML: reports/test_report.html
 - Screenshots en fallos: reports/screenshots/
 
-SOLUCION DE PROBLEMAS COMUNES
------------------------------
-- Error "No compatible browsers could be set up!": verificar Chrome o Edge instalado.
-- Error "ChromeDriver not found": verificar conexion a internet o ejecutar nuevamente.
-- Error "Connection timeout": usar modo headless o incrementar EXPLICIT_WAIT en config.py.
-- Error "Element not found": revisar localizadores en pages/.
+SOLUCION DE PROBLEMAS
+---------------------
+1. Error "No compatible browsers could be set up!":
+   - Verificar que Google Chrome o Microsoft Edge está instalado.
+   - Si usa un navegador no estándar, establecer BROWSER=chrome o BROWSER=edge.
+
+2. Error "ChromeDriver not found" o "SessionNotCreated":
+   - Verificar conexión a internet (WebDriver Manager necesita descargar el driver).
+   - Actualizar Chrome/Edge a la última versión estable.
+   - Ejecutar de nuevo: pip install --upgrade webdriver-manager
+
+3. Error "Connection timeout" o "TimeoutException":
+   - Aumentar el tiempo de espera: set EXPLICIT_WAIT=30
+   - Verificar conexión a internet y acceso a www.demoblaze.com.
+   - Intentar en modo headless: set HEADLESS=true
+
+4. Error "Element not found" o "StaleElementReferenceException":
+   - El sitio Demoblaze puede tener latencia variable.
+   - Los tests incluyen reintentos automáticos para estos casos.
+
+5. Error "ModuleNotFoundError: No module named 'selenium'":
+   - Activar el entorno virtual antes de ejecutar.
+   - Reinstalar dependencias: pip install -r requirements.txt
+
+6. PowerShell no reconoce "set HEADLESS=true && ...":
+   - Usar la sintaxis de PowerShell: $env:HEADLESS="true"; python run_tests.py
+
+INTEGRACION CONTINUA
+--------------------
+El proyecto incluye un pipeline de GitHub Actions (.github/workflows/e2e-tests.yml)
+que ejecuta automáticamente las pruebas en modo headless con Chrome.
+Los reportes HTML y screenshots se archivan como artifacts del workflow.
 
 INFORMACION DEL PROYECTO
 ------------------------
-- Ultima actualizacion: 03 de Mayo, 2026
-- Version: 1.0
+- Ultima actualizacion: 31 de Mayo, 2026
+- Version: 1.1
 - Autor: Alexander Morales
-

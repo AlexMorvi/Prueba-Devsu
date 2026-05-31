@@ -23,12 +23,8 @@
 hs_err_pid*
 replay_pid*
 
-# Maven (exclude most of target/ but allow reports)
-target/classes/
-target/generated-sources/
-target/generated-test-sources/
-target/maven-archiver/
-target/maven-status/
+# Maven build output (fully ignored — reports are regenerated on each run)
+target/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
@@ -37,14 +33,12 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
 
-# Allow Karate reports to be committed
-!target/karate-reports/
-!target/surefire-reports/
-!target/test-classes/
+# Maven Wrapper — allow the jar and properties to be committed
+!.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
 
-# Exclude only Karate logs
+# Karate logs
 karate.log
 
 # IDE files
@@ -59,6 +53,10 @@ karate.log
 *.swp
 *.swo
 *~
+
+# Eclipse
+.metadata/
+bin/
 
 # OS generated files
 .DS_Store

@@ -1,0 +1,64 @@
+name: E2E Tests - Selenium + Pytest
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'Ejercicio E2E/**'
+      - '.github/workflows/e2e-tests.yml'
+  pull_request:
+    branches: [ main, master ]
+    paths:
+      - 'Ejercicio E2E/**'
+      - '.github/workflows/e2e-tests.yml'
+  workflow_dispatch:
+
+jobs:
+  e2e-tests:
+    name: Run Selenium E2E Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 'Ejercicio E2E'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: 'Ejercicio E2E/requirements.txt'
+
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: 'stable'
+
+      - name: Verify environment
+        run: |
+          python --version
+          pip --version
+          google-chrome --version || true
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run E2E tests (headless)
+        env:
+          HEADLESS: 'true'
+          BROWSER: 'chrome'
+        run: |
+          python run_tests.py
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-report
+          path: |
+            Ejercicio E2E/reports/test_report.html
+            Ejercicio E2E/reports/screenshots/
+          retention-days: 30

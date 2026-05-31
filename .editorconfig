@@ -1,0 +1,44 @@
+# EditorConfig helps maintain consistent coding styles across IDEs
+# https://editorconfig.org
+# Este archivo aplica a AMBOS ejercicios (API y E2E) por estar en la raíz.
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# --- Ejercicio API (Java / Karate) ---
+
+[*.{xml,json}]
+indent_size = 4
+
+[*.java]
+indent_size = 4
+
+[*.feature]
+indent_size = 2
+
+# --- Ejercicio E2E (Python / Selenium) ---
+
+[*.py]
+indent_size = 4
+max_line_length = 120
+
+[*.ini]
+indent_size = 4
+
+# --- Compartido ---
+
+[*.{yml,yaml}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.txt]
+trim_trailing_whitespace = false
